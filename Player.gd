@@ -18,6 +18,7 @@ onready var animatedSprite: = $AnimatedSprite
 onready var ladderCheck: = $LadderCheck
 onready var jumpBufferTimer: = $JumpBufferTimer
 onready var coyoteJumpTimer: = $CoyoteJumpTimer
+onready var remoteTransform2D: = $RemoteTransform2D
 
 func _physics_process(delta):	
 	var input = Vector2.ZERO
@@ -96,6 +97,11 @@ func horizontal_move(input):
 func can_jump():
 	return is_on_floor() || coyote_jump
 
+func connect_camera(camera):
+	var camera_path = camera.get_path()
+	remoteTransform2D.remote_path = camera_path
+	
+
 func reset_double_jump():
 	double_jump = moveData.DOUBLE_JUMP_COUNT
 	
@@ -117,7 +123,8 @@ func climb_state(input):
 
 func player_die():
 	SoundPlayer.play_sound(SoundPlayer.HURT)
-	get_tree().reload_current_scene()
+	queue_free()	#get_tree().reload_current_scene()
+	Events.emit_signal("player_died")
 
 func is_on_ladder():
 	if !ladderCheck.is_colliding(): return false
